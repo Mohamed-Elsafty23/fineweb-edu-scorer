@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Streamlit
+.streamlit/secrets.toml
+
+# API Keys and Secrets (original files with hardcoded keys)
+api_test.py
+
+# Note: config.py is now safe to commit - it reads from secrets, no hardcoded keys
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project specific - unrelated files
+datatrove/
+desc.txt
+*.pdf
+
+# Data (optional - uncomment if data is large)
+# data/
+# models/
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
+
