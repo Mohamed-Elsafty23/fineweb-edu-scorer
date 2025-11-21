@@ -174,7 +174,7 @@ def main():
                 
                 with col2:
                     st.markdown("**Cleaned Text (first 1000 chars)**")
-                    st.text_area("", result['text'][:1000], height=200, label_visibility="collapsed", disabled=True)
+                    st.text_area("Cleaned Text Preview", result['text'][:1000], height=200, label_visibility="collapsed", disabled=True)
                 
                 with st.expander("📄 View full cleaned text"):
                     st.text_area("Full content", result['text'], height=400, label_visibility="collapsed", disabled=True)
