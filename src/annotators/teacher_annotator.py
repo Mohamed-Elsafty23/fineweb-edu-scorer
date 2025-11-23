@@ -189,7 +189,7 @@ def test_teacher_annotator():
         if result['error']:
             print(f"Error: {result['error']}")
         else:
-            print(f"✓ Score: {result['score']}/5")
+            print(f"Score: {result['score']}/5")
             print(f"Decision: {result['decision']}")
             print(f"Reasoning: {result['reasoning'][:200]}...")
 

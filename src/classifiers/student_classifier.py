@@ -202,7 +202,7 @@ class StudentClassifier:
         }
         
         joblib.dump(model_data, path)
-        print(f"\n✓ Model saved to {path}")
+        print(f"\nModel saved to {path}")
     
     @classmethod
     def load(cls, path: str = None):
@@ -226,7 +226,7 @@ class StudentClassifier:
         classifier.regressor = model_data['regressor']
         classifier.is_trained = model_data['is_trained']
         
-        print(f"✓ Model loaded from {path}")
+        print(f"Model loaded from {path}")
         return classifier
 
 
@@ -251,7 +251,7 @@ def test_student_classifier():
     prediction = classifier.predict(test_text)
     print(f"\nTest prediction: {prediction:.2f}")
     
-    print("\n✓ Student classifier test passed!")
+    print("\nStudent classifier test passed!")
 
 
 if __name__ == "__main__":

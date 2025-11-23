@@ -16,7 +16,7 @@ import config
 
 st.set_page_config(
     page_title="FineWeb-Edu: Educational Content Scorer",
-    page_icon="📚",
+    page_icon=None,
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -44,8 +44,8 @@ def main():
     
     initialize_models()
     
-    # Professional header
-    st.title("📚 FineWeb-Edu: Educational Content Scorer")
+    # Header
+    st.title("FineWeb-Edu: Educational Content Scorer")
     st.markdown("**Interactive Demo** | Three-Phase Knowledge Distillation Pipeline")
     st.markdown("*Replicating the methodology from \"The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale\"*")
     
@@ -88,13 +88,13 @@ def main():
         }
         
         with col1:
-            if st.button("📚 Wikipedia Article", use_container_width=True, help="High educational value", key="btn_url_1"):
+            if st.button("Wikipedia Article", use_container_width=True, help="High educational value", key="btn_url_1"):
                 st.session_state.url_input_field = example_urls["Wikipedia (High)"]
         with col2:
-            if st.button("📖 Python Tutorial", use_container_width=True, help="Medium educational value", key="btn_url_2"):
+            if st.button("Python Tutorial", use_container_width=True, help="Medium educational value", key="btn_url_2"):
                 st.session_state.url_input_field = example_urls["Python Docs (Medium)"]
         with col3:
-            if st.button("📰 News Website", use_container_width=True, help="Low educational value", key="btn_url_3"):
+            if st.button("News Website", use_container_width=True, help="Low educational value", key="btn_url_3"):
                 st.session_state.url_input_field = example_urls["News Article (Low)"]
         
         # URL input - Streamlit automatically syncs with session state via key
@@ -125,13 +125,13 @@ def main():
         }
         
         with col1:
-            if st.button("📚 Educational Text", use_container_width=True, help="High quality educational content", key="btn_text_1"):
+            if st.button("Educational Text", use_container_width=True, help="High quality educational content", key="btn_text_1"):
                 st.session_state.text_input_field = example_texts["Educational"]
         with col2:
-            if st.button("📊 Mixed Content", use_container_width=True, help="Educational mixed with promotional", key="btn_text_2"):
+            if st.button("Mixed Content", use_container_width=True, help="Educational mixed with promotional", key="btn_text_2"):
                 st.session_state.text_input_field = example_texts["Mixed Quality"]
         with col3:
-            if st.button("🛍️ Promotional Text", use_container_width=True, help="Non-educational spam", key="btn_text_3"):
+            if st.button("Promotional Text", use_container_width=True, help="Non-educational spam", key="btn_text_3"):
                 st.session_state.text_input_field = example_texts["Non-Educational"]
         
         # Text input - Streamlit automatically syncs with session state via key
@@ -147,25 +147,25 @@ def main():
         input_value = text_input
     
     if input_provided:
-        analyze_button = st.button("🚀 Analyze Content", type="primary", use_container_width=True)
+        analyze_button = st.button("Analyze Content", type="primary", use_container_width=True)
         
         if analyze_button:
             st.divider()
             
-            # ============ PHASE 1: TEXT EXTRACTION ============
+            # Phase 1: Text Extraction
             st.markdown("## Phase 1: Text Extraction")
-            st.caption("*Internal process: Using Trafilatura to remove boilerplate (ads, navigation, etc.)*")
+            st.caption("*Using Trafilatura to remove boilerplate like ads and navigation*")
             
             if input_method == "URL":
-                with st.spinner("📡 Fetching webpage and extracting content..."):
+                with st.spinner("Fetching webpage and extracting content..."):
                     result = st.session_state.extractor.extract_from_url(input_value)
                     
                 if result['error']:
-                    st.error(f"❌ Extraction failed: {result['error']}")
+                    st.error(f"Extraction failed: {result['error']}")
                     return
                 
                 # Show comparison
-                st.success(f"✅ Successfully extracted {len(result['text'])} characters")
+                st.success(f"Successfully extracted {len(result['text'])} characters")
                 
                 col1, col2 = st.columns(2)
                 with col1:
@@ -176,34 +176,34 @@ def main():
                     st.markdown("**Cleaned Text (first 1000 chars)**")
                     st.text_area("Cleaned Text Preview", result['text'][:1000], height=200, label_visibility="collapsed", disabled=True)
                 
-                with st.expander("📄 View full cleaned text"):
+                with st.expander("View full cleaned text"):
                     st.text_area("Full content", result['text'], height=400, label_visibility="collapsed", disabled=True)
                 
                 st.session_state.current_text = result['text']
                 st.session_state.current_url = input_value
             else:
                 # Direct text input
-                st.info(f"✅ Using provided text ({len(input_value)} characters)")
+                st.info(f"Using provided text ({len(input_value)} characters)")
                 st.session_state.current_text = input_value
                 st.session_state.current_url = "Direct input"
             
             st.divider()
             
-            # ============ PHASE 2: TEACHER SCORING ============
+            # Phase 2: Teacher Scoring
             st.markdown("## Phase 2: Teacher Model (LLM) Scoring")
-            st.caption("*Internal process: Llama-3.3-70B evaluates content using educational rubric (Appendix F.1)*")
+            st.caption("*Llama-3.3-70B evaluates content using educational rubric from the paper*")
             
-            with st.spinner("🤖 Teacher LLM analyzing content... (10-30 seconds)"):
+            with st.spinner("Teacher LLM analyzing content... (10-30 seconds)"):
                 annotation = st.session_state.teacher.get_educational_score(st.session_state.current_text)
                 st.session_state.teacher_annotation = annotation
             
             if annotation['error']:
-                st.error(f"❌ Scoring failed: {annotation['error']}")
+                st.error(f"Scoring failed: {annotation['error']}")
                 return
             
             score = annotation['score']
             
-            # Display results professionally
+            # Display results
             col1, col2 = st.columns([1, 2])
             
             with col1:
@@ -212,25 +212,25 @@ def main():
                 st.progress(score / 5)
                 
                 if score >= config.EDUCATIONAL_THRESHOLD:
-                    st.success(f"✅ **KEEP** (≥{config.EDUCATIONAL_THRESHOLD})")
+                    st.success(f"**KEEP** (≥{config.EDUCATIONAL_THRESHOLD})")
                 else:
-                    st.error(f"❌ **DISCARD** (<{config.EDUCATIONAL_THRESHOLD})")
+                    st.error(f"**DISCARD** (<{config.EDUCATIONAL_THRESHOLD})")
             
             with col2:
                 st.markdown("### Educational Value Assessment")
                 st.write(annotation['reasoning'])
             
-            with st.expander("🔍 View detailed LLM response"):
+            with st.expander("View detailed LLM response"):
                 st.code(annotation['full_response'])
             
             st.divider()
             
-            # ============ PHASE 3: STUDENT PREDICTION ============
+            # Phase 3: Student Prediction
             st.markdown("## Phase 3: Student Model (Fast Classifier)")
-            st.caption("*Internal process: Ridge regression on E5-Large embeddings (1024-dim) predicts score*")
+            st.caption("*Ridge regression on E5-Large embeddings predicts the score*")
             
             if st.session_state.student_loaded:
-                with st.spinner("⚡ Student model predicting... (2-5 seconds)"):
+                with st.spinner("Student model predicting... (2-5 seconds)"):
                     prediction = st.session_state.student.predict(st.session_state.current_text)
                     st.session_state.student_prediction = prediction
                 
@@ -254,20 +254,20 @@ def main():
                 student_decision = "KEEP" if prediction >= config.EDUCATIONAL_THRESHOLD else "DISCARD"
                 
                 if teacher_decision == student_decision:
-                    st.success(f"✅ **Models Agree**: Both predict {teacher_decision}")
+                    st.success(f"**Models Agree**: Both predict {teacher_decision}")
                 else:
-                    st.warning(f"⚠️ **Models Disagree**: Teacher: {teacher_decision} | Student: {student_decision}")
+                    st.warning(f"**Models Disagree**: Teacher: {teacher_decision} | Student: {student_decision}")
                 
                 # Performance insight
                 st.markdown("### Knowledge Distillation Performance")
                 if error <= 0.5:
-                    st.info("🌟 **Excellent**: Student closely replicates Teacher's scoring (MAE ≤ 0.5)")
+                    st.info("**Excellent**: Student closely replicates Teacher's scoring (MAE ≤ 0.5)")
                 elif error <= 1.0:
-                    st.info("✓ **Good**: Student prediction is reasonable (MAE ≤ 1.0)")
+                    st.info("**Good**: Student prediction is reasonable (MAE ≤ 1.0)")
                 else:
-                    st.warning("⚠️ **Fair**: Significant difference - Student may need more training data")
+                    st.warning("**Fair**: Significant difference - Student may need more training data")
             else:
-                st.warning("⚠️ **Student model not trained**")
+                st.warning("**Student model not trained**")
                 st.info("""
                 To train the Student classifier:
                 ```bash
@@ -292,9 +292,9 @@ def main():
             with summary_col2:
                 st.markdown("**Final Decision:**")
                 if score >= config.EDUCATIONAL_THRESHOLD:
-                    st.success(f"✅ **Educational Content** (Score: {score}/5)")
+                    st.success(f"**Educational Content** (Score: {score}/5)")
                 else:
-                    st.error(f"❌ **Non-Educational Content** (Score: {score}/5)")
+                    st.error(f"**Non-Educational Content** (Score: {score}/5)")
                 
                 if st.session_state.student_loaded:
                     st.write(f"Student model: {prediction:.2f}/5 ({student_decision})")

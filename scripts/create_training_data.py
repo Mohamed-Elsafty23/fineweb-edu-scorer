@@ -65,7 +65,7 @@ def sample_diverse_texts(dataset_name: str = "HuggingFaceFW/fineweb-edu",
         seen_texts.add(text_preview)
         sampled_texts.append(text)
     
-    print(f"✓ Sampled {len(sampled_texts)} texts")
+    print(f"Sampled {len(sampled_texts)} texts")
     return sampled_texts
 
 
@@ -111,7 +111,7 @@ def annotate_with_teacher(texts: list, output_path: str = None) -> pd.DataFrame:
     output_path = output_path or config.TRAINING_DATA_PATH
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df.to_csv(output_path, index=False)
-    print(f"\n✓ Saved annotated dataset to {output_path}")
+    print(f"\nSaved annotated dataset to {output_path}")
     
     # Print statistics
     print("\n=== Dataset Statistics ===")
@@ -153,7 +153,7 @@ def main():
     df = annotate_with_teacher(texts)
     
     print("\n" + "=" * 60)
-    print("✓ Training data generation complete!")
+    print("Training data generation complete!")
     print("=" * 60)
     print(f"\nNext step: Run 'python scripts/train_student.py' to train the Student classifier")
 

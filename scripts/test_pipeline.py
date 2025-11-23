@@ -42,15 +42,15 @@ def test_pipeline():
     try:
         student = StudentClassifier.load()
         student_available = True
-        print("  ✓ Web Extractor initialized")
-        print("  ✓ Teacher Annotator initialized")
-        print("  ✓ Student Classifier loaded")
+        print("  Web Extractor initialized")
+        print("  Teacher Annotator initialized")
+        print("  Student Classifier loaded")
     except FileNotFoundError:
         student = None
         student_available = False
-        print("  ✓ Web Extractor initialized")
-        print("  ✓ Teacher Annotator initialized")
-        print("  ⚠ Student Classifier not found (train it first)")
+        print("  Web Extractor initialized")
+        print("  Teacher Annotator initialized")
+        print("  Student Classifier not found (train it first)")
     
     # Run tests
     results = []
@@ -67,7 +67,7 @@ def test_pipeline():
         extraction_result = extractor.extract_from_url(test_case['url'])
         
         if extraction_result['error']:
-            print(f"  ❌ Extraction failed: {extraction_result['error']}")
+            print(f"  Extraction failed: {extraction_result['error']}")
             results.append({
                 'url': test_case['url'],
                 'status': 'extraction_failed',
@@ -76,7 +76,7 @@ def test_pipeline():
             continue
         
         text = extraction_result['text']
-        print(f"  ✓ Extracted {len(text)} characters")
+        print(f"  Extracted {len(text)} characters")
         print(f"  Preview: {text[:150]}...")
         
         # Step 2: Teacher annotation
@@ -85,7 +85,7 @@ def test_pipeline():
         teacher_result = teacher.get_educational_score(text)
         
         if teacher_result['error']:
-            print(f"  ❌ Teacher annotation failed: {teacher_result['error']}")
+            print(f"  Teacher annotation failed: {teacher_result['error']}")
             results.append({
                 'url': test_case['url'],
                 'status': 'teacher_failed',
@@ -95,8 +95,8 @@ def test_pipeline():
         
         teacher_score = teacher_result['score']
         teacher_decision = teacher_result['decision']
-        print(f"  ✓ Teacher Score: {teacher_score}/5")
-        print(f"  ✓ Decision: {teacher_decision}")
+        print(f"  Teacher Score: {teacher_score}/5")
+        print(f"  Decision: {teacher_decision}")
         print(f"  Reasoning: {teacher_result['reasoning'][:150]}...")
         
         # Step 3: Student prediction
@@ -108,23 +108,23 @@ def test_pipeline():
             try:
                 student_score = student.predict(text)
                 student_decision = 'KEEP' if student_score >= config.EDUCATIONAL_THRESHOLD else 'DISCARD'
-                print(f"  ✓ Student Score: {student_score:.2f}/5")
-                print(f"  ✓ Decision: {student_decision}")
+                print(f"  Student Score: {student_score:.2f}/5")
+                print(f"  Decision: {student_decision}")
                 
                 # Compare
                 error = abs(teacher_score - student_score)
-                print(f"\n  📊 Comparison:")
+                print(f"\n  Comparison:")
                 print(f"     Teacher: {teacher_score}/5 → {teacher_decision}")
                 print(f"     Student: {student_score:.2f}/5 → {student_decision}")
                 print(f"     Error: {error:.2f}")
                 
                 if teacher_decision == student_decision:
-                    print(f"     ✅ Agreement on decision!")
+                    print(f"     Agreement on decision!")
                 else:
-                    print(f"     ⚠️ Disagreement on decision")
+                    print(f"     Disagreement on decision")
                 
             except Exception as e:
-                print(f"  ❌ Student prediction failed: {str(e)}")
+                print(f"  Student prediction failed: {str(e)}")
                 student_score = None
         else:
             print("\n[4/4] Student prediction skipped (model not trained)")
@@ -159,15 +159,15 @@ def test_pipeline():
                 print(f"    Teacher: {r['teacher_score']}/5 → {r['teacher_decision']}")
                 if r['student_score']:
                     print(f"    Student: {r['student_score']:.2f}/5 → {r['student_decision']}")
-                    print(f"    Agreement: {'✅' if r['agreement'] else '⚠️'}")
+                    print(f"    Agreement: {'Yes' if r['agreement'] else 'No'}")
     
     print(f"\n{'=' * 70}")
     if successful == len(results):
-        print("✅ All tests passed!")
+        print("All tests passed!")
     elif successful > 0:
-        print("⚠️ Some tests passed, check errors above")
+        print("Some tests passed, check errors above")
     else:
-        print("❌ All tests failed")
+        print("All tests failed")
     print('=' * 70)
 
 

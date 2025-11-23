@@ -38,7 +38,7 @@ def load_training_data(path: str = None) -> tuple:
     # Filter out failed annotations
     df = df[df['score'].notna()].copy()
     
-    print(f"✓ Loaded {len(df)} annotated samples")
+    print(f"Loaded {len(df)} annotated samples")
     print(f"\nDataset statistics:")
     print(f"  Score range: {df['score'].min():.1f} - {df['score'].max():.1f}")
     print(f"  Mean score: {df['score'].mean():.2f}")
@@ -124,7 +124,7 @@ def main():
         classifier.save()
         
         print("\n" + "=" * 60)
-        print("✓ Student classifier training complete!")
+        print("Student classifier training complete!")
         print("=" * 60)
         print(f"\nModel saved to: {config.STUDENT_MODEL_PATH}")
         print(f"\nNext step: Run 'streamlit run app.py' to launch the interactive UI")

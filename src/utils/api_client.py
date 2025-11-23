@@ -135,7 +135,7 @@ def test_api_client():
     print(f"Embeddings shape: {embeddings.shape}")
     print(f"First embedding (first 5 dims): {embeddings[0][:5]}")
     
-    print("\n✓ API Client tests passed!")
+    print("\nAPI Client tests passed!")
 
 
 if __name__ == "__main__":

@@ -124,7 +124,7 @@ def test_web_extractor():
         if result['error']:
             print(f"Error: {result['error']}")
         else:
-            print(f"✓ Successfully extracted {len(result['text'])} characters")
+            print(f"Successfully extracted {len(result['text'])} characters")
             print(f"Preview: {result['text'][:200]}...")
 
 
