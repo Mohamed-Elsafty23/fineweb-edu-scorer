@@ -1,8 +1,3 @@
-"""
-Teacher model annotator for educational content scoring.
-Implements the educational scoring methodology from FineWeb paper Appendix F.1.
-"""
-
 import re
 from typing import Dict, Optional
 from src.utils.api_client import api_client
@@ -10,12 +5,7 @@ import config
 
 
 class TeacherAnnotator:
-    """
-    Uses a large LLM (Teacher) to score text on educational value (0-5 scale).
-    Based on the FineWeb-Edu knowledge distillation approach.
-    """
     
-    # Educational scoring prompt based on FineWeb paper Appendix F.1
     EDUCATIONAL_PROMPT_TEMPLATE = """Below is an extract from a web page. Evaluate whether the page has a high educational value and could be useful in an educational setting for teaching from primary school to grade school levels using the additive 5-point scoring system described below.
 
 Points are accumulated based on the satisfaction of each criterion:
@@ -35,41 +25,15 @@ After examining the extract:
 """
     
     def __init__(self, api_client_instance=None):
-        """
-        Initialize the teacher annotator.
-        
-        Args:
-            api_client_instance: Optional API client instance (uses global if not provided)
-        """
         self.api_client = api_client_instance or api_client
     
     def truncate_text(self, text: str, max_words: int = 2000) -> str:
-        """
-        Truncate text to a maximum number of words.
-        
-        Args:
-            text: Text to truncate
-            max_words: Maximum number of words
-            
-        Returns:
-            Truncated text
-        """
         words = text.split()
         if len(words) > max_words:
             return ' '.join(words[:max_words]) + "..."
         return text
     
     def parse_score(self, response: str) -> Optional[int]:
-        """
-        Parse the educational score from LLM response.
-        
-        Args:
-            response: LLM response text
-            
-        Returns:
-            Extracted score (0-5) or None if parsing failed
-        """
-        # Look for "Educational score: X" pattern
         patterns = [
             r"Educational score:\s*(\d+)",
             r"educational score:\s*(\d+)",
@@ -89,20 +53,6 @@ After examining the extract:
         return None
     
     def get_educational_score(self, text: str) -> Dict:
-        """
-        Get educational score for a piece of text using the Teacher LLM.
-        
-        Args:
-            text: Text to score
-            
-        Returns:
-            Dictionary containing:
-                - 'score': Educational score (0-5) or None if failed
-                - 'reasoning': LLM's reasoning for the score
-                - 'full_response': Complete LLM response
-                - 'decision': 'KEEP' if score >= 3, 'DISCARD' otherwise
-                - 'error': Error message if scoring failed
-        """
         result = {
             'score': None,
             'reasoning': None,
@@ -112,13 +62,10 @@ After examining the extract:
         }
         
         try:
-            # Truncate text if too long
             truncated_text = self.truncate_text(text)
             
-            # Create prompt
             prompt = self.EDUCATIONAL_PROMPT_TEMPLATE.format(text=truncated_text)
             
-            # Get LLM response
             response = self.api_client.get_llm_response(
                 prompt=prompt,
                 system_message="You are an expert educational content evaluator. Analyze the text carefully and provide a fair, accurate assessment.",
@@ -128,7 +75,6 @@ After examining the extract:
             
             result['full_response'] = response
             
-            # Parse score
             score = self.parse_score(response)
             
             if score is None:
@@ -145,15 +91,6 @@ After examining the extract:
         return result
     
     def annotate_batch(self, texts: list) -> list:
-        """
-        Annotate a batch of texts.
-        
-        Args:
-            texts: List of text strings to annotate
-            
-        Returns:
-            List of annotation dictionaries
-        """
         annotations = []
         for i, text in enumerate(texts):
             print(f"Annotating text {i+1}/{len(texts)}...")
@@ -163,20 +100,16 @@ After examining the extract:
 
 
 def test_teacher_annotator():
-    """Test the teacher annotator with sample texts."""
     print("Testing Teacher Annotator...")
     
     annotator = TeacherAnnotator()
     
-    # Test texts with different expected educational values
     test_texts = [
-        # High educational value
         """Machine learning is a subset of artificial intelligence that enables computers to learn from data 
         without being explicitly programmed. It involves algorithms that can identify patterns in data and make 
         predictions or decisions based on those patterns. The three main types of machine learning are supervised 
         learning, unsupervised learning, and reinforcement learning.""",
         
-        # Low educational value
         """Click here now! Best deals on products you don't need! Buy now and save! 
         Limited time offer! Subscribe to our newsletter!"""
     ]
@@ -196,4 +129,3 @@ def test_teacher_annotator():
 
 if __name__ == "__main__":
     test_teacher_annotator()
-

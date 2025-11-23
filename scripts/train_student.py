@@ -1,8 +1,3 @@
-"""
-Train the Student classifier on Teacher-annotated data.
-Generates embeddings and trains a regression model to predict educational scores.
-"""
-
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -15,15 +10,6 @@ from src.classifiers.student_classifier import StudentClassifier
 
 
 def load_training_data(path: str = None) -> tuple:
-    """
-    Load the Teacher-annotated training data.
-    
-    Args:
-        path: Path to training data CSV
-        
-    Returns:
-        Tuple of (texts, scores)
-    """
     path = path or config.TRAINING_DATA_PATH
     
     if not os.path.exists(path):
@@ -35,7 +21,6 @@ def load_training_data(path: str = None) -> tuple:
     print(f"Loading training data from {path}...")
     df = pd.read_csv(path)
     
-    # Filter out failed annotations
     df = df[df['score'].notna()].copy()
     
     print(f"Loaded {len(df)} annotated samples")
@@ -52,22 +37,10 @@ def load_training_data(path: str = None) -> tuple:
 
 
 def train_and_evaluate(texts: list, scores: list, test_size: float = 0.2):
-    """
-    Train the Student classifier and evaluate on test set.
-    
-    Args:
-        texts: List of text strings
-        scores: List of educational scores
-        test_size: Proportion of data to use for testing
-        
-    Returns:
-        Trained StudentClassifier instance
-    """
     print("\n" + "=" * 60)
     print("Training Student Classifier")
     print("=" * 60)
     
-    # Split data
     X_train, X_test, y_train, y_test = train_test_split(
         texts, scores, test_size=test_size, random_state=42
     )
@@ -76,7 +49,6 @@ def train_and_evaluate(texts: list, scores: list, test_size: float = 0.2):
     print(f"  Training samples: {len(X_train)}")
     print(f"  Test samples: {len(X_test)}")
     
-    # Initialize and train classifier
     print(f"\nInitializing Student classifier...")
     print(f"  Embedding model: {config.EMBEDDING_MODEL}")
     
@@ -85,11 +57,9 @@ def train_and_evaluate(texts: list, scores: list, test_size: float = 0.2):
     print("\n--- Training Phase ---")
     train_metrics = classifier.train(X_train, y_train)
     
-    # Evaluate on test set
     print("\n--- Evaluation Phase ---")
     test_metrics = classifier.evaluate(X_test, y_test)
     
-    # Compare a few predictions
     print("\n--- Sample Predictions ---")
     num_samples = min(5, len(X_test))
     for i in range(num_samples):
@@ -103,23 +73,19 @@ def train_and_evaluate(texts: list, scores: list, test_size: float = 0.2):
 
 
 def main():
-    """Main function to train the Student classifier."""
     print("=" * 60)
     print("FineWeb-Edu Student Classifier Training")
     print("=" * 60)
     
     try:
-        # Load data
         texts, scores = load_training_data()
         
         if len(texts) < 10:
             print(f"\nWarning: Only {len(texts)} samples available. Consider generating more training data.")
             print("Continuing with available data...")
         
-        # Train and evaluate
         classifier = train_and_evaluate(texts, scores)
         
-        # Save model
         print("\n--- Saving Model ---")
         classifier.save()
         
@@ -141,4 +107,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

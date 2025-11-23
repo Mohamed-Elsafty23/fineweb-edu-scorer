@@ -1,8 +1,3 @@
-"""
-Integration test for the complete FineWeb-Edu pipeline.
-Tests extraction, Teacher annotation, and Student prediction on sample URLs.
-"""
-
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -14,12 +9,10 @@ import config
 
 
 def test_pipeline():
-    """Test the complete pipeline with sample URLs."""
     print("=" * 70)
     print("FineWeb-Edu Pipeline Integration Test")
     print("=" * 70)
     
-    # Test URLs with expected different educational values
     test_cases = [
         {
             'url': 'https://en.wikipedia.org/wiki/Machine_learning',
@@ -33,12 +26,10 @@ def test_pipeline():
         }
     ]
     
-    # Initialize components
     print("\n[1/4] Initializing components...")
     extractor = WebExtractor()
     teacher = TeacherAnnotator()
     
-    # Try to load Student model
     try:
         student = StudentClassifier.load()
         student_available = True
@@ -52,7 +43,6 @@ def test_pipeline():
         print("  Teacher Annotator initialized")
         print("  Student Classifier not found (train it first)")
     
-    # Run tests
     results = []
     
     for i, test_case in enumerate(test_cases):
@@ -62,7 +52,6 @@ def test_pipeline():
         print(f"Expected: {test_case['expected']} educational value")
         print('=' * 70)
         
-        # Step 1: Extract text
         print("\n[2/4] Extracting text...")
         extraction_result = extractor.extract_from_url(test_case['url'])
         
@@ -79,7 +68,6 @@ def test_pipeline():
         print(f"  Extracted {len(text)} characters")
         print(f"  Preview: {text[:150]}...")
         
-        # Step 2: Teacher annotation
         print("\n[3/4] Getting Teacher annotation...")
         print("  (This may take 10-30 seconds...)")
         teacher_result = teacher.get_educational_score(text)
@@ -99,7 +87,6 @@ def test_pipeline():
         print(f"  Decision: {teacher_decision}")
         print(f"  Reasoning: {teacher_result['reasoning'][:150]}...")
         
-        # Step 3: Student prediction
         student_score = None
         student_decision = None
         
@@ -111,7 +98,6 @@ def test_pipeline():
                 print(f"  Student Score: {student_score:.2f}/5")
                 print(f"  Decision: {student_decision}")
                 
-                # Compare
                 error = abs(teacher_score - student_score)
                 print(f"\n  Comparison:")
                 print(f"     Teacher: {teacher_score}/5 → {teacher_decision}")
@@ -129,7 +115,6 @@ def test_pipeline():
         else:
             print("\n[4/4] Student prediction skipped (model not trained)")
         
-        # Store results
         results.append({
             'url': test_case['url'],
             'expected': test_case['expected'],
@@ -141,7 +126,6 @@ def test_pipeline():
             'agreement': teacher_decision == student_decision if student_score else None
         })
     
-    # Summary
     print(f"\n{'=' * 70}")
     print("Test Summary")
     print('=' * 70)
@@ -173,4 +157,3 @@ def test_pipeline():
 
 if __name__ == "__main__":
     test_pipeline()
-

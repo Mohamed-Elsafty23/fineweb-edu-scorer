@@ -1,8 +1,3 @@
-"""
-FineWeb-Edu: Educational Content Scorer - Interactive Demo
-A three-phase pipeline for scoring educational web content using Knowledge Distillation
-"""
-
 import streamlit as st
 import sys
 import os
@@ -23,9 +18,8 @@ st.set_page_config(
 
 
 def initialize_models():
-    """Initialize models and cache them in session state."""
     if 'extractor' not in st.session_state:
-        st.session_state.extractor = WebExtractor(max_text_length=1000000)  # Remove limit
+        st.session_state.extractor = WebExtractor(max_text_length=1000000)
     
     if 'teacher' not in st.session_state:
         st.session_state.teacher = TeacherAnnotator()
@@ -40,18 +34,15 @@ def initialize_models():
 
 
 def main():
-    """Main application function."""
     
     initialize_models()
     
-    # Header
     st.title("FineWeb-Edu: Educational Content Scorer")
     st.markdown("**Interactive Demo** | Three-Phase Knowledge Distillation Pipeline")
     st.markdown("*Replicating the methodology from \"The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale\"*")
     
     st.divider()
     
-    # Overview of the three phases
     st.markdown("### Pipeline Overview")
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -63,7 +54,6 @@ def main():
     
     st.divider()
     
-    # Input options
     st.markdown("### Input Source")
     input_method = st.radio(
         "Choose your input method:",
@@ -73,11 +63,9 @@ def main():
     )
     
     if input_method == "URL":
-        # Initialize session state for URL
         if 'url_input_field' not in st.session_state:
             st.session_state.url_input_field = ""
         
-        # Example URLs
         st.markdown("**Quick Examples:**")
         col1, col2, col3 = st.columns(3)
         
@@ -97,7 +85,6 @@ def main():
             if st.button("News Website", use_container_width=True, help="Low educational value", key="btn_url_3"):
                 st.session_state.url_input_field = example_urls["News Article (Low)"]
         
-        # URL input - Streamlit automatically syncs with session state via key
         url_input = st.text_input(
             "Enter URL:",
             placeholder="https://en.wikipedia.org/wiki/Machine_learning",
@@ -108,11 +95,9 @@ def main():
         input_provided = bool(url_input)
         input_value = url_input
     else:
-        # Initialize session state for text
         if 'text_input_field' not in st.session_state:
             st.session_state.text_input_field = ""
         
-        # Example texts
         st.markdown("**Quick Examples:**")
         col1, col2, col3 = st.columns(3)
         
@@ -134,7 +119,6 @@ def main():
             if st.button("Promotional Text", use_container_width=True, help="Non-educational spam", key="btn_text_3"):
                 st.session_state.text_input_field = example_texts["Non-Educational"]
         
-        # Text input - Streamlit automatically syncs with session state via key
         text_input = st.text_area(
             "Paste your text here:",
             height=200,
@@ -152,7 +136,6 @@ def main():
         if analyze_button:
             st.divider()
             
-            # Phase 1: Text Extraction
             st.markdown("## Phase 1: Text Extraction")
             st.caption("*Using Trafilatura to remove boilerplate like ads and navigation*")
             
@@ -164,7 +147,6 @@ def main():
                     st.error(f"Extraction failed: {result['error']}")
                     return
                 
-                # Show comparison
                 st.success(f"Successfully extracted {len(result['text'])} characters")
                 
                 col1, col2 = st.columns(2)
@@ -182,14 +164,12 @@ def main():
                 st.session_state.current_text = result['text']
                 st.session_state.current_url = input_value
             else:
-                # Direct text input
                 st.info(f"Using provided text ({len(input_value)} characters)")
                 st.session_state.current_text = input_value
                 st.session_state.current_url = "Direct input"
             
             st.divider()
             
-            # Phase 2: Teacher Scoring
             st.markdown("## Phase 2: Teacher Model (LLM) Scoring")
             st.caption("*Llama-3.3-70B evaluates content using educational rubric from the paper*")
             
@@ -203,7 +183,6 @@ def main():
             
             score = annotation['score']
             
-            # Display results
             col1, col2 = st.columns([1, 2])
             
             with col1:
@@ -225,7 +204,6 @@ def main():
             
             st.divider()
             
-            # Phase 3: Student Prediction
             st.markdown("## Phase 3: Student Model (Fast Classifier)")
             st.caption("*Ridge regression on E5-Large embeddings predicts the score*")
             
@@ -234,7 +212,6 @@ def main():
                     prediction = st.session_state.student.predict(st.session_state.current_text)
                     st.session_state.student_prediction = prediction
                 
-                # Comparison
                 col1, col2, col3 = st.columns(3)
                 
                 with col1:
@@ -249,7 +226,6 @@ def main():
                              delta=f"{'-' if error < 0.5 else '+'}{error:.2f}",
                              delta_color="inverse")
                 
-                # Agreement analysis
                 teacher_decision = "KEEP" if score >= config.EDUCATIONAL_THRESHOLD else "DISCARD"
                 student_decision = "KEEP" if prediction >= config.EDUCATIONAL_THRESHOLD else "DISCARD"
                 
@@ -258,7 +234,6 @@ def main():
                 else:
                     st.warning(f"**Models Disagree**: Teacher: {teacher_decision} | Student: {student_decision}")
                 
-                # Performance insight
                 st.markdown("### Knowledge Distillation Performance")
                 if error <= 0.5:
                     st.info("**Excellent**: Student closely replicates Teacher's scoring (MAE ≤ 0.5)")
@@ -271,14 +246,13 @@ def main():
                 st.info("""
                 To train the Student classifier:
                 ```bash
-                python scripts/create_training_data.py  # Generate training data
-                python scripts/train_student.py         # Train the model
+                python scripts/create_training_data.py
+                python scripts/train_student.py
                 ```
                 """)
             
             st.divider()
             
-            # Summary
             st.markdown("## Summary")
             summary_col1, summary_col2 = st.columns(2)
             
@@ -299,7 +273,6 @@ def main():
                 if st.session_state.student_loaded:
                     st.write(f"Student model: {prediction:.2f}/5 ({student_decision})")
     
-    # Footer
     st.divider()
     st.markdown("---")
     st.caption("**Implementation**: Based on 'The FineWeb Datasets' paper (Penedo et al., 2024) | **Models**: Llama-3.3-70B (Teacher), Ridge Regression on E5-Large (Student)")
